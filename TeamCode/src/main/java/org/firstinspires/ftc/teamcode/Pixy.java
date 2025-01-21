@@ -12,7 +12,8 @@ import com.qualcomm.robotcore.hardware.configuration.annotations.DevicePropertie
 import com.qualcomm.robotcore.hardware.configuration.annotations.I2cDeviceType;
 
 /**
- * Hello! This file was written by Alexander W Bur of team 5962 Nordic Storm, on jan 20th 2025.
+ * Hello! This file was written by Alexander W Bur of team 5962 Nordic Storm on jan 20th 2025.
+ * Please reach out! contact us at FTC-5962@saintpeterrobotics.org
  */
 @I2cDeviceType
 @DeviceProperties(name = "Pixy2", description = "Pixy2 Smart Camera", xmlTag = "MCP9808")
@@ -35,6 +36,14 @@ public class Pixy extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
     private PixyBlock pixyBlock;
 
     /**
+     * if there are no valid results detected by pixy, we return
+     * an empty block object to hold the space of a pixy block.
+     * all of its fields are set to 0, and returns false
+     * for "block.isValid()"
+     */
+    private final EmptyBlock emptyBlock;
+
+    /**
      * You should never directly call this constructor!
      * To instantiate Pixy, do it like you would any other sensor or motor...
      *  Pixy pixy = hardwareMap.get(Pixy.class, "device name here");
@@ -50,13 +59,15 @@ public class Pixy extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
         readWindow = new I2cDeviceSynch.ReadWindow(0, 26, I2cDeviceSynch.ReadMode.REPEAT);
 
         this.engage();
+
+        emptyBlock = new EmptyBlock();
     }
 
 
     /**
-     * use me! If pixy has data of interest to us, we return a freshly updated PixyBlock object
+     * use me! If pixy has data of interest, we return a freshly updated PixyBlock object
      * detailing what the camera is tracking. If nothing is found, we return an "EmptyBlock" object
-     * with all of its fields set to 0.
+     * with all of its fields set to 0. This method will never throw a null pointer.
      *
      * @return a freshly updated pixyBlock
      */
@@ -64,7 +75,7 @@ public class Pixy extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
         if (isValidResult()) {
             return pixyBlock;
         } else {
-            return new EmptyBlock();
+            return emptyBlock;
         }
     }
 
@@ -118,7 +129,7 @@ public class Pixy extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
         this is the data request we send to pixy to get back the block/color object
          */
         byte[] blockRequest = {(byte) 174, (byte) 193, (byte) 32, (byte) 2, (byte) 3, (byte) 1};
-        // note that here 3 indicates we wish to see signatures from one and two
+        // note that here, 3 indicates we wish to see blocks from signatures 1 and 2 (1 + 2)
         // and 1 indicates that we are only interested in seeing 1 block detected by pixy
 
         /*
@@ -135,19 +146,14 @@ public class Pixy extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
         /*
         now we convert the data to update the pixyBlock
          */
-//        telemetry.addData("1 ", TypeConversion.unsignedByteToInt(rawBytes[0]));
-//        telemetry.addData("type", TypeConversion.unsignedByteToInt(rawBytes[2]));
-//        telemetry.addData("sig", TypeConversion.unsignedByteToInt((byte)combineBytes(rawBytes[6], rawBytes[7])));
-//        telemetry.addData("Checksum", TypeConversion.unsignedByteToInt((byte)combineBytes(rawBytes[4], rawBytes[5])));
         if (combineBytes(rawBytes[0], rawBytes[1]) == 0xc1af) {
-            //telemetry.addLine("found sync");
             pixyBlock = bytesToBlock(rawBytes);
         }
     }
 
     /**
-     * @return a pixyBlock parsed from data *bytes* given back by pixy
-     * @Param the bytes of data to be processed into a "PixyBlock: object
+     * @return a pixyBlock parsed from the data *bytes* given back by pixy
+     * @Param the bytes of data to be processed into a "PixyBlock" object
      */
     private PixyBlock bytesToBlock(@NonNull byte[] rawBytes) {
         PixyBlock detectedBlock = new PixyBlock();
@@ -167,7 +173,7 @@ public class Pixy extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
     /*
     essentially combines to bytes into one. i.e generates a 16-bit word.
     some data relayed by pixy doesn't fit in 1 byte, so we use this to combine
-    two relevant bytes into one interpretable byte.
+    two relevant bytes into one interpretable int.
      */
     public int combineBytes(byte lower, byte upper) {
         return (((int) upper & 0xff) << 8) | ((int) lower & 0xff);

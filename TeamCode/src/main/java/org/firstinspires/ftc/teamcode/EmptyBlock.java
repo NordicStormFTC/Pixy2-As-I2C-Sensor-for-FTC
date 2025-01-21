@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import androidx.annotation.NonNull;
+
 public class EmptyBlock extends PixyBlock {
     public final int sync = 0;
     public final int checksum = 0;
@@ -17,6 +19,7 @@ public class EmptyBlock extends PixyBlock {
         return false;
     }
 
+    @NonNull
     public String toString(){
         return "";
     }
