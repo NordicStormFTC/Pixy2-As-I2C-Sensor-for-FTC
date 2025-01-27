@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode;
 
 public class PixyBlock {
 
-    public int sync;
     public int checksum;
     public int signature;
     public int centerX;

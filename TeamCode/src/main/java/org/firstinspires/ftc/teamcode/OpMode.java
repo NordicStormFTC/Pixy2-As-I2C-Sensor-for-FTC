@@ -16,7 +16,12 @@ public class OpMode extends LinearOpMode {
         while(opModeIsActive()){
 
             detectedBlock = pixy.getBlock();
+
             telemetry.addLine(detectedBlock.toString());
+
+            if(detectedBlock.isValid()){
+                // do something
+            }
             telemetry.update();
         }
     }

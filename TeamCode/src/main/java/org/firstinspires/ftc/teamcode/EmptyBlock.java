@@ -21,6 +21,6 @@ public class EmptyBlock extends PixyBlock {
 
     @NonNull
     public String toString(){
-        return "";
+        return "No valid block detected!";
     }
 }

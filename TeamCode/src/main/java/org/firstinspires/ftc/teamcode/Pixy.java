@@ -44,6 +44,11 @@ public class Pixy extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
     private final EmptyBlock emptyBlock;
 
     /**
+     * this is how we determine if Pixy is sending us valid data
+     */
+    private final int syncWord = 0xc1af;
+
+    /**
      * You should never directly call this constructor!
      * To instantiate Pixy, do it like you would any other sensor or motor...
      *  Pixy pixy = hardwareMap.get(Pixy.class, "device name here");
@@ -146,7 +151,7 @@ public class Pixy extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
         /*
         now we convert the data to update the pixyBlock
          */
-        if (combineBytes(rawBytes[0], rawBytes[1]) == 0xc1af) {
+        if (combineBytes(rawBytes[0], rawBytes[1]) == syncWord) {
             pixyBlock = bytesToBlock(rawBytes);
         }
     }
@@ -175,7 +180,7 @@ public class Pixy extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
     some data relayed by pixy doesn't fit in 1 byte, so we use this to combine
     two relevant bytes into one interpretable int.
      */
-    public int combineBytes(byte lower, byte upper) {
+    private int combineBytes(byte lower, byte upper) {
         return (((int) upper & 0xff) << 8) | ((int) lower & 0xff);
     }
 
