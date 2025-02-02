@@ -120,6 +120,9 @@ public class Pixy extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
         return combineBytes((byte) lower, (byte) upper);
     }
 
+    /*
+    in our case, the only results were interested in are those with a signature of 1 or 2
+     */
     private boolean isValidResult() {
         updateBlock();
         return pixyBlock.signature == 1 || pixyBlock.signature == 2;
@@ -176,7 +179,7 @@ public class Pixy extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
     }
 
     /*
-    essentially combines to bytes into one. i.e generates a 16-bit word.
+    essentially combines two bytes into one. i.e generates a 16-bit word.
     some data relayed by pixy doesn't fit in 1 byte, so we use this to combine
     two relevant bytes into one interpretable int.
      */

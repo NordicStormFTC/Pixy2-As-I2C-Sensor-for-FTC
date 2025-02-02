@@ -12,6 +12,8 @@ public class OpMode extends LinearOpMode {
         pixy = hardwareMap.get(Pixy.class, "deviceName");
         PixyBlock detectedBlock;
 
+        pixy.turnOffLamps();
+
         waitForStart();
         while(opModeIsActive()){
 
