@@ -26,9 +26,9 @@ public class Pixy extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
     private final I2cDeviceSynch.ReadWindow readWindow;
 
     /**
-     if you wanted to track multiple blocks, you
+     if you wanted to track multiple blocks instead of one, you
      would make a list of blocks, and instead of "updateBlock()"
-     you would have updateList(). This object is exposed through
+     you would have updateList(). This block object is exposed through
      "getBlock()" which updates the block before handing it to the user.
      this means that "updateBlock()" does not need to be called
      in any loop, and "getBlock()" will never throw a null pointer error.
@@ -85,8 +85,8 @@ public class Pixy extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
     }
 
     /**
-     * Here we don't need to read anything back from the device,
-     * just send it a request to turn the lamps on or off.
+     * Here were just sending a request to the device,
+     * not reading anything from it.
      */
     public void turnOnLamps() {
         final byte[] lampRequest = {(byte) 174, (byte) 193, (byte) 22, (byte) 2, (byte) 1, (byte) 1};
@@ -121,7 +121,8 @@ public class Pixy extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
     }
 
     /*
-    in our case, the only results were interested in are those with a signature of 1 or 2
+    in our case, the only results we're interested in are those with a signature of 1 or 2
+    you can set signatures in the pixymon software
      */
     private boolean isValidResult() {
         updateBlock();
@@ -129,12 +130,12 @@ public class Pixy extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
     }
 
     /**
-     * this updates the pixy block object and is called before returning the object in "getBlock()"
+     * this updates the pixy block object, and is called before returning the object in "getBlock()"
      * as such users do not need to call it in their loop.
      */
     private void updateBlock() {
         /*
-        this is the data request we send to pixy to get back the block/color object
+        this is the data request message we send to pixy to get back the block/color object
          */
         byte[] blockRequest = {(byte) 174, (byte) 193, (byte) 32, (byte) 2, (byte) 3, (byte) 1};
         // note that here, 3 indicates we wish to see blocks from signatures 1 and 2 (1 + 2)
@@ -188,7 +189,7 @@ public class Pixy extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
     }
 
 
-    //-------------- baggage from the REV I2C API
+    //-------------- baggage from the REV I2C API, not our problem.
     @Override
     protected boolean doInitialize() {
         ((LynxI2cDeviceSynch) (deviceClient)).setBusSpeed(LynxI2cDeviceSynch.BusSpeed.FAST_400K);

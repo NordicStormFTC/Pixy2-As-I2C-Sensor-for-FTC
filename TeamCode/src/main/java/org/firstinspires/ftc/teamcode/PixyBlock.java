@@ -17,6 +17,9 @@ public class PixyBlock {
         return true;
     }
 
+    /*
+    use this for telemetry info
+     */
     @Override
     public String toString(){
         return "[ signature: " + signature + "\ncenterX: " + centerX + "\ncenterY: " + centerY + "\nwidth: " + width + "\nheight: " + height + "\nage: " + age + " ]";
